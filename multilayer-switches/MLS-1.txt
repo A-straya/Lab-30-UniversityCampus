@@ -1,0 +1,160 @@
+hostname MLS1
+no ip domain-lookup
+ip routing
+!
+vlan 10
+ name ADMIN
+!
+vlan 20
+ name FINANCE
+!
+vlan 30
+ name HR
+!
+vlan 40
+ name COMPUTING
+!
+vlan 50
+ name ART
+!
+vlan 60
+ name LAB
+!
+vlan 70
+ name IT
+!
+vlan 80
+ name STAFF
+!
+
+interface GigabitEthernet1/0/1
+ description ROUTED_LINK_TO_R1_G0/0
+ no switchport
+ ip address 10.0.0.14 255.255.255.252
+ no shutdown
+!
+interface Vlan10
+ description ADMIN_DEFAULT_GATEWAY
+ ip address 172.16.10.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan20
+ description FINANCE_DEFAULT_GATEWAY
+ ip address 172.16.20.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan30
+ description HR_DEFAULT_GATEWAY
+ ip address 172.16.30.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan40
+ description COMPUTING_DEFAULT_GATEWAY
+ ip address 172.16.40.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan50
+ description ART_DEFAULT_GATEWAY
+ ip address 172.16.50.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan60
+ description LAB_DEFAULT_GATEWAY
+ ip address 172.16.60.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan70
+ description IT_DEFAULT_GATEWAY
+ ip address 172.16.70.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan80
+ description STAFF_DEFAULT_GATEWAY
+ ip address 172.16.80.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+
+interface GigabitEthernet1/0/2
+ description TO_SW1_VLAN10
+ switchport mode trunk
+ switchport trunk allowed vlan 10
+ no shutdown
+!
+interface GigabitEthernet1/0/3
+ description TO_SW2_VLAN20
+ switchport mode trunk
+ switchport trunk allowed vlan 20
+ no shutdown
+!
+interface GigabitEthernet1/0/4
+ description TO_SW3_VLAN30
+ switchport mode trunk
+ switchport trunk allowed vlan 30
+ no shutdown
+!
+interface GigabitEthernet1/0/5
+ description TO_SW4_VLAN40
+ switchport mode trunk
+ switchport trunk allowed vlan 40
+ no shutdown
+!
+interface GigabitEthernet1/0/6
+ description TO_SW5_VLAN50
+ switchport mode trunk
+ switchport trunk allowed vlan 50
+ no shutdown
+!
+interface GigabitEthernet1/0/7
+ description TO_SW6_VLAN60
+ switchport mode trunk
+ switchport trunk allowed vlan 60
+ no shutdown
+!
+interface GigabitEthernet1/0/8
+ description TO_SW7_VLAN70
+ switchport mode trunk
+ switchport trunk allowed vlan 70
+ no shutdown
+!
+interface GigabitEthernet1/0/9
+ description TO_SW8_VLAN80
+ switchport mode trunk
+ switchport trunk allowed vlan 80
+ no shutdown
+!
+
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,20,30,40,50,60,70,80 root primary
+!
+router ospf 10
+ router-id 11.11.11.11
+ passive-interface default
+ no passive-interface GigabitEthernet1/0/1
+ network 10.0.0.12 0.0.0.3 area 0
+ network 172.16.10.0 0.0.0.255 area 0
+ network 172.16.20.0 0.0.0.255 area 0
+ network 172.16.30.0 0.0.0.255 area 0
+ network 172.16.40.0 0.0.0.255 area 0
+ network 172.16.50.0 0.0.0.255 area 0
+ network 172.16.60.0 0.0.0.255 area 0
+ network 172.16.70.0 0.0.0.255 area 0
+ network 172.16.80.0 0.0.0.255 area 0
+!
+ip access-list standard VTY-MGMT
+ permit 172.16.70.0 0.0.0.255
+!
+line vty 0 15
+ login local
+ transport input ssh
+ access-class VTY-MGMT in
+!
+end
+write memory
