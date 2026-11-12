@@ -1,0 +1,77 @@
+hostname MLS2
+no ip domain-lookup
+ip routing
+!
+vlan 90
+ name BUSINESS
+!
+vlan 100
+ name STUDENT_LAB
+!
+
+interface GigabitEthernet1/0/1
+ description ROUTED_LINK_TO_R3_G0/0
+ no switchport
+ ip address 10.0.0.10 255.255.255.252
+ no shutdown
+!
+
+interface Vlan90
+ description BUSINESS_DEFAULT_GATEWAY
+ ip address 172.16.90.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ no shutdown
+!
+interface Vlan100
+ description STUDENT_LAB_DEFAULT_GATEWAY
+ ip address 172.16.100.1 255.255.255.0
+ ip helper-address 192.168.1.1
+ ip access-group STUDENT-LAB-IN in
+ no shutdown
+!
+ip access-list extended STUDENT-LAB-IN
+ remark Permit DHCP relay traffic
+ permit udp any eq bootpc any eq bootps
+ remark Permit DNS queries to central server
+ permit udp 172.16.100.0 0.0.0.255 host 192.168.1.10 eq domain
+ permit tcp 172.16.100.0 0.0.0.255 host 192.168.1.10 eq domain
+ remark Block access to internal private networks
+ deny ip 172.16.100.0 0.0.0.255 172.16.0.0 0.0.255.255
+ deny ip 172.16.100.0 0.0.0.255 192.168.1.0 0.0.0.255
+ remark Permit external destinations for PAT
+ permit ip 172.16.100.0 0.0.0.255 any
+!
+
+interface GigabitEthernet1/0/2
+ description TO_SW9_VLAN90
+ switchport mode trunk
+ switchport trunk allowed vlan 90
+ no shutdown
+!
+interface GigabitEthernet1/0/3
+ description TO_SW10_VLAN100
+ switchport mode trunk
+ switchport trunk allowed vlan 100
+ no shutdown
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan 90,100 root primary
+!
+router ospf 10
+ router-id 22.22.22.22
+ passive-interface default
+ no passive-interface GigabitEthernet1/0/1
+ network 10.0.0.8 0.0.0.3 area 0
+ network 172.16.90.0 0.0.0.255 area 0
+ network 172.16.100.0 0.0.0.255 area 0
+!
+ip access-list standard VTY-MGMT
+ permit 172.16.70.0 0.0.0.255
+!
+line vty 0 15
+ login local
+ transport input ssh
+ access-class VTY-MGMT in
+!
+end
+write memory
