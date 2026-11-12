@@ -1,0 +1,63 @@
+hostname SW4
+no ip domain-lookup
+!
+vlan 40
+ name COMPUTING
+!
+interface FastEthernet0/1
+ description UPLINK_TO_MLS1
+ switchport mode trunk
+ switchport trunk allowed vlan 40
+ no shutdown
+!
+interface FastEthernet0/2
+ description ENDPOINT_PC
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+!
+interface FastEthernet0/3
+ description DEPARTMENT_PRINTER
+ switchport mode access
+ switchport access vlan 40
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+ switchport port-security
+ switchport port-security maximum 2
+ switchport port-security mac-address sticky
+ switchport port-security violation restrict
+ no shutdown
+!
+interface Vlan40
+ description SWITCH_MANAGEMENT
+ ip address 172.16.40.2 255.255.255.0
+ no shutdown
+!
+ip default-gateway 172.16.40.1
+!
+interface range FastEthernet0/4-24
+ description UNUSED_PORTS
+ shutdown
+!
+ip domain-name university.local
+username netadmin privilege 15 secret ChangeMe-SSH-2026
+crypto key generate rsa modulus 1024
+ip ssh version 2
+ip access-list standard VTY-MGMT
+ permit 172.16.70.0 0.0.0.255
+!
+line vty 0 15
+ login local
+ transport input ssh
+ access-class VTY-MGMT in
+!
+spanning-tree mode rapid-pvst
+!
+end
+write memory
