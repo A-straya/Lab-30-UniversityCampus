@@ -1,0 +1,62 @@
+hostname R1
+no ip domain-lookup
+service password-encryption
+enable secret ChangeMe-SSH-2026
+ip domain-name university.local
+username netadmin privilege 15 secret ChangeMe-SSH-2026
+crypto key generate rsa modulus 1024
+ip ssh version 2
+!
+interface Serial0/0/0
+ description TO_R2_SERIAL0/0/0
+ ip address 10.0.0.2 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface Serial0/0/1
+ description TO_R3_SERIAL0/0/1
+ ip address 10.0.0.5 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface GigabitEthernet0/0
+ description TO_MLS1_GI1/0/1
+ ip address 10.0.0.13 255.255.255.252
+ ip nat inside
+ no shutdown
+!
+interface GigabitEthernet0/1
+ description TO_ISP_GI0/0_OUTSIDE
+ ip address 203.0.113.1 255.255.255.252
+ ip nat outside
+ no shutdown
+!
+ip access-list standard NAT-INSIDE
+ permit 172.16.0.0 0.0.255.255
+ permit 192.168.1.0 0.0.0.255
+!
+ip nat inside source list NAT-INSIDE interface GigabitEthernet0/1 overload
+ip route 0.0.0.0 0.0.0.0 203.0.113.2
+!
+router ospf 10
+ router-id 1.1.1.1
+ passive-interface default
+ no passive-interface Serial0/0/0
+ no passive-interface Serial0/0/1
+ no passive-interface GigabitEthernet0/0
+ network 10.0.0.0 0.0.0.3 area 0
+ network 10.0.0.4 0.0.0.3 area 0
+ network 10.0.0.12 0.0.0.3 area 0
+ default-information originate
+!
+ip access-list standard VTY-MGMT
+ permit 172.16.70.0 0.0.0.255
+!
+line vty 0 4
+ login local
+ transport input ssh
+ access-class VTY-MGMT in
+ exec-timeout 10 0
+!
+end
+write memory
