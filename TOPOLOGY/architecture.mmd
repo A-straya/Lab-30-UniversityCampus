@@ -1,0 +1,18 @@
+flowchart TB
+    ISP["ISP Router<br/>203.0.113.2/30<br/>Loopback 198.51.100.1"]
+    R1["R1 - Core Router<br/>OSPF · PAT"]
+    R2["R2 - DHCP / Server Router"]
+    R3["R3 - Campus 2 Router"]
+    MLS1["MLS1 - Campus 1 Core<br/>VLAN 10–80"]
+    MLS2["MLS2 - Campus 2 Core<br/>VLAN 90, 100"]
+    SWA["SW1–SW8<br/>8 Department Access Switches"]
+    SWB["SW9–SW10<br/>2 Campus 2 Access Switches"]
+    SRV["Server-PT<br/>192.168.1.10"]
+    ISP --- R1
+    R2 --- R1
+    R1 --- R3
+    R1 --- MLS1
+    R3 --- MLS2
+    R2 --- SRV
+    MLS1 --- SWA
+    MLS2 --- SWB
