@@ -5,7 +5,7 @@
   <img src="https://img.shields.io/badge/CISCO-Packet%20Tracer-049FD9?style=for-the-badge&logo=cisco&logoColor=white" />
   <img src="https://img.shields.io/badge/NETWORK-ENGINEERING-212121?style=for-the-badge" />
   <img src="https://img.shields.io/badge/OSPF-AREA%200-2F6DB5?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/STATUS-IN%20PROGRESS-orange?style=for-the-badge" />
+ 
 </p>
 
 ---
